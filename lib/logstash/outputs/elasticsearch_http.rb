@@ -92,6 +92,9 @@ class LogStash::Outputs::ElasticSearchHTTP < LogStash::Outputs::Base
   # written.
   config :replication, :validate => ['async', 'sync'], :default => 'sync'
 
+  # TODO documentation: The status that should be upserted.
+  config :status, :validate => :string, :default => nil
+
   public
   def register
     require "ftw" # gem ftw

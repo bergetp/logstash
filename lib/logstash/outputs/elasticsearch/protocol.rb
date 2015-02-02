@@ -95,6 +95,15 @@ module LogStash::Outputs::Elasticsearch
       NEWLINE = "\n".freeze
       def bulk_ftw(actions)
         body = actions.collect do |action, args, source|
+          if action == 'upsert_status'
+            source = {
+                'upsert' => "{}",
+                "scripted_upsert" => true,
+                "script" => "ctx._source.status = (ctx._source.status) ? ctx._source.status + \"#{args[:_status]}\" : [\"#{args[:_status]}\"]"
+            }
+            action = 'update'
+            args[:_retry_on_conflict] = 10
+          end
           header = { action => args }
           if source
             next [ header.to_json, NEWLINE, source.to_json, NEWLINE ]

@@ -165,7 +165,7 @@ class LogStash::Outputs::ElasticSearch < LogStash::Outputs::Base
   # `protocol` on non-java rubies is "http"
   config :protocol, :validate => [ "node", "transport", "http" ]
 
-  # The Elasticsearch action to perform. Valid actions are: `index`, `delete`.
+  # The Elasticsearch action to perform. Valid actions are: `index`, `delete`, 'status_upsert'.
   #
   # Use of this setting *REQUIRES* you also configure the `document_id` setting
   # because `delete` actions all require a document id.
@@ -177,6 +177,9 @@ class LogStash::Outputs::ElasticSearch < LogStash::Outputs::Base
   #
   # For more details on actions, check out the [Elasticsearch bulk API documentation](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-bulk.html)
   config :action, :validate => :string, :default => "index"
+
+  # TODO documentation: The status that should be upserted.
+  config :status, :validate => :string, :default => nil
 
   public
   def register
@@ -308,7 +311,8 @@ class LogStash::Outputs::ElasticSearch < LogStash::Outputs::Base
     index = event.sprintf(@index)
 
     document_id = @document_id ? event.sprintf(@document_id) : nil
-    buffer_receive([event.sprintf(@action), { :_id => document_id, :_index => index, :_type => type }, event.to_hash])
+    status = @status ? event.sprintf(@status) : nil
+    buffer_receive([event.sprintf(@action), { :_id => document_id, :_index => index, :_type => type, :_status => status }, event.to_hash])
   end # def receive
 
   def flush(actions, teardown=false)
