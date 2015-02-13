@@ -1,0 +1,13 @@
+{
+  "template": "documents-*",
+  "order": 1,
+  "settings": {
+    "number_of_shards": 2,
+    "index.store.type": "memory"
+  },
+  "mappings": {
+    "_default_": {
+      "_timestamp" : {"enabled": true, "type":"date", "format": "yyyy-MM-dd HH:mm:ss.SSS", "store":true}
+    }
+  }
+}
